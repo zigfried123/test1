@@ -1,0 +1,78 @@
+CREATE TABLE book
+(
+    id SERIAL NOT NULL CONSTRAINT book_pk PRIMARY KEY,
+    name VARCHAR(128)
+);
+
+INSERT INTO book (id, name) VALUES (10, 'book1'),(11, 'book2'),(12, 'book3');
+
+CREATE TYPE cover_type AS ENUM('мягкая','твердая');
+
+CREATE TABLE book_property
+(
+    id SERIAL NOT NULL CONSTRAINT book_property_pk PRIMARY KEY,
+    circulation INT,
+    cover_type  cover_type,
+    book_id     INT
+        CONSTRAINT book_property_book_id_fk
+            REFERENCES book
+            ON UPDATE CASCADE ON DELETE SET NULL
+);
+
+INSERT INTO book_property (id, circulation, cover_type, book_id) VALUES (13, 5000, 'твердая', 10),(14, 5000, 'твердая', 11),(15, 5000, 'твердая', 12);
+
+CREATE INDEX book_property_circulation_cover_type_index
+    ON book_property (circulation DESC, cover_type ASC);
+
+CREATE TABLE category
+(
+    id SERIAl NOT NULL CONSTRAINT category_pk PRIMARY KEY,
+    book_id INT CONSTRAINT category_book_id_fk REFERENCES book ON UPDATE CASCADE ON DELETE SET NULL
+);
+
+INSERT INTO category (book_id) VALUES (10),(10),(10),(10),(10),(10),(10),(10),(10),(10);
+INSERT INTO category (book_id) VALUES (11),(11),(11),(11),(11),(11),(11),(11),(11),(11);
+
+
+SELECT b.* FROM book b
+INNER JOIN category c ON b.id = c.book_id
+INNER JOIN book_property bp ON b.id = bp.book_id
+WHERE bp.circulation = 5000 AND bp.cover_type = 'твердая'
+GROUP BY b.id
+HAVING count(b.*)>3
+ORDER BY b.id;
+
+
+CREATE TEMP TABLE IF NOT EXISTS book2
+(
+    id          INT,
+    name        VARCHAR(128)
+);
+
+INSERT INTO book2 (id, name) SELECT id,name FROM book;
+
+WITH book_tmp AS (SELECT
+    b.*,
+    b2.*,
+    (SELECT count(*) FROM category c WHERE c.book_id=b.id) AS count1,
+    (SELECT count(*) FROM category c WHERE c.book_id=b2.id) AS count2
+
+FROM book b
+         CROSS JOIN book2 b2
+
+WHERE b.id <> b2.id
+GROUP BY b.id,b.name,b2.id,b2.name)
+
+SELECT
+    btmp.*,
+    CASE LEAST(count1,count2) >= 10
+        WHEN TRUE
+            THEN LEAST(count1,count2)
+        ELSE NULL
+END
+    AS common_categories
+
+
+FROM book_tmp btmp;
+
+
