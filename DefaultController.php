@@ -47,12 +47,12 @@ class DefaultController extends AbstractController
      */
     public function index(Client $redis, VisitCounter $visitCounterService)
     {
-        $redis->flushall();
-
         $this->logIn();
+    }
 
-        $counts = $visitCounterService->getCountsByRange($redis);
-
+    public function statVisitor(Client $redis, VisitCounter $visitCounterService)
+    {
+        $counts = $visitCounterService->getStat();
     }
 }
 

@@ -56,13 +56,22 @@ class VisitCounter
     }
 
     /**
+     * @return array|Response
+     * @throws \Exception
+     */
+    public function getStat()
+    {
+        return $this->getCountsByRange();
+    }
+
+    /**
      * @param Client $redis
      * @return array|Response
      * @throws \Exception
      */
-    public function getCountsByRange(Client $redis)
+    private function getCountsByRange()
     {
-        $logData = $this->getLogData($redis);
+        $logData = $this->getLogData();
 
         $ranges = $this->getRanges('1', 's', current($logData['dates']), end($logData['dates']));
 
@@ -91,7 +100,7 @@ class VisitCounter
      * @param $redis
      * @return array
      */
-    private function getLogData($redis): array
+    private function getLogData(): array
     {
         $id = 0;
         $dates = [];
@@ -99,7 +108,7 @@ class VisitCounter
 
         while (true) {
             ++$id;
-            $log = $redis->hmget("log:$id", ['datetime', 'count']);
+            $log = $this->redis->hmget("log:$id", ['datetime', 'count']);
             if ($log[0] == null) {
                 break;
             }
