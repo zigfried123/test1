@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\Response;
-
 use Predis\Client;
 
 class VisitCounter
