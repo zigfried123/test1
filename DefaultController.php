@@ -50,6 +50,13 @@ class DefaultController extends AbstractController
         $this->logIn();
     }
 
+    /**
+     * Statistic by visitors
+     *
+     * @param Client $redis
+     * @param VisitCounter $visitCounterService
+     * @throws \Exception
+     */
     public function statVisitor(Client $redis, VisitCounter $visitCounterService)
     {
         $counts = $visitCounterService->getStat();

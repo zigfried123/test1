@@ -21,6 +21,9 @@ class VisitCounter
         $this->redis = $redis;
     }
 
+    /**
+     * Log to redis when login
+     */
     public function logIn(): void
     {
         $redis = $this->redis;
@@ -38,6 +41,9 @@ class VisitCounter
         $redis->hmset("log:$id", ['datetime' => time(), 'status' => 1, 'count' => $count]);
     }
 
+    /**
+     * Log to redis when logoff
+     */
     public function logOff(): void
     {
         $redis = $this->redis;
@@ -56,6 +62,8 @@ class VisitCounter
     }
 
     /**
+     * Gets statistic by visitors
+     *
      * @return array|Response
      * @throws \Exception
      */
@@ -65,6 +73,8 @@ class VisitCounter
     }
 
     /**
+     * Gets count visitors for some range
+     *
      * @param Client $redis
      * @return array|Response
      * @throws \Exception
@@ -97,6 +107,8 @@ class VisitCounter
     }
 
     /**
+     * Gets data from Redis and build map
+     *
      * @param $redis
      * @return array
      */
@@ -123,6 +135,8 @@ class VisitCounter
     }
 
     /**
+     * Gets ranges by interval
+     *
      * @param int $interval
      * @param string $unit
      * @param int $start
