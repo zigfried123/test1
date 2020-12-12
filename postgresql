@@ -42,15 +42,6 @@ GROUP BY b.id
 HAVING count(b.*)>3
 ORDER BY b.id;
 
-
-CREATE TEMP TABLE IF NOT EXISTS book2
-(
-    id          INT,
-    name        VARCHAR(128)
-);
-
-INSERT INTO book2 (id, name) SELECT id,name FROM book;
-
 WITH book_tmp AS (SELECT
     b.*,
     b2.*,
@@ -58,7 +49,7 @@ WITH book_tmp AS (SELECT
     (SELECT count(*) FROM category c WHERE c.book_id=b2.id) AS count2
 
 FROM book b
-         CROSS JOIN book2 b2
+         CROSS JOIN (SELECT * FROM book) as b2
 
 WHERE b.id <> b2.id
 GROUP BY b.id,b.name,b2.id,b2.name)
